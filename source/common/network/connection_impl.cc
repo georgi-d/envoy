@@ -206,6 +206,12 @@ void ConnectionImpl::noDelay(bool enable) {
   }
 #endif
 
+// #ifdef _ESX
+  if (0 != rc) {
+    return;
+  }
+// #endif
+
   RELEASE_ASSERT(0 == rc);
   UNREFERENCED_PARAMETER(rc);
 }
