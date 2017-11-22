@@ -719,6 +719,22 @@ RouteConstSharedPtr VirtualHostImpl::getRouteFromEntries(const Http::HeaderMap& 
   for (const RouteEntryImplBaseConstSharedPtr& route : routes_) {
     RouteConstSharedPtr route_entry = route->matches(headers, random_value);
     if (nullptr != route_entry) {
+      const auto& opaqueConfig = route->opaqueConfig();
+      const auto it = opaqueConfig.find("action");
+      if (it == opaqueConfig.end()) {
+        ENVOY_LOG_MISC(debug, "no route action");
+        return route_entry;
+      }
+      ENVOY_LOG_MISC(debug, "route action: {}", it->second);
+      if (it->second == "allow") {
+        return route_entry;
+      } else if (it->second == "redirect") {
+        return headers.ForwardedProto()->value() != "https" &&
+               !headers.EnvoyInternalRequest()
+               ? SSL_REDIRECT_ROUTE : route_entry;
+      } else if (it->second == "reject") {
+        return nullptr;
+      }
       return route_entry;
     }
   }
