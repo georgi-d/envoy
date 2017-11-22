@@ -67,7 +67,9 @@ void ConnectionManagerUtility::mutateRequestHeaders(
 
   // At this point we can determine whether this is an internal or external request. This is done
   // via XFF, which was set above or we trust.
-  bool internal_request = Utility::isInternalRequest(request_headers);
+  bool internal_request = Utility::isInternalRequest(request_headers) ||
+                          Network::Utility::isLocalConnection(connection.localAddress(),
+                                                              connection.remoteAddress());
 
   // Edge request is the request from external clients to front Envoy.
   // Request from front Envoy to the internal service will be treated as not edge request.

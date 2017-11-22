@@ -200,6 +200,16 @@ Address::InstanceConstSharedPtr Utility::getLocalAddress(const Address::IpVersio
   return ret;
 }
 
+bool Utility::isLocalConnection(const Address::Instance& local_address,
+                                const Address::Instance& remote_address) {
+  if (local_address.type() != Address::Type::Ip ||
+      remote_address.type() != Address::Type::Ip) {
+    return false;
+  }
+
+  return local_address.ip()->addressAsString() == remote_address.ip()->addressAsString();
+}
+
 bool Utility::isInternalAddress(const char* address) {
   // First try as an IPv4 address.
   in_addr addr;
